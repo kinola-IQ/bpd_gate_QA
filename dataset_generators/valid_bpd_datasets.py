@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from dataset_generator_utils import DatasetBundle, binary_target
+from dataset_generator_utils import DatasetBundle, binary_target, sigmoid
+
+
 def generate_fraud_dataset(
     n=5000,
     seed=42,
