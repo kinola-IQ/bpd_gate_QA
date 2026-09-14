@@ -1,0 +1,576 @@
+{
+  "gate_status": "BLOCKED",
+  "task": "binary",
+  "model_metric": "roc_auc",
+  "model_score": 0.9766,
+  "model_auc": 0.9766,
+  "n_flags": 6,
+  "total_duration_ms": 207198.38,
+  "results_by_category": {
+    "validation": [
+      {
+        "check_name": "target_leakage",
+        "flag": "OK",
+        "detail": "no single feature approaches the model's own predictive power (0.953)",
+        "blocking": true,
+        "metadata": {
+          "model_power": 0.9533,
+          "threshold_ratio": 0.95,
+          "min_power": 0.8,
+          "n_features_scored": 11
+        },
+        "duration_ms": 73.32
+      },
+      {
+        "check_name": "split_overlap",
+        "flag": "OK",
+        "detail": "0 duplicate row(s) within the validation set (0.0%, max 5%) \u2014 duplicates weight the same observation more than once in every metric",
+        "blocking": true,
+        "metadata": {
+          "check": "duplicates_within_validation",
+          "n_duplicates": 0,
+          "duplicate_fraction": 0.0,
+          "threshold": 0.05
+        },
+        "duration_ms": 80.24
+      },
+      {
+        "check_name": "split_overlap",
+        "flag": "OK",
+        "detail": "0 of 11250 validation rows (0.0%, max 1%) also appear in X_train, compared over 11 shared column(s)",
+        "blocking": true,
+        "metadata": {
+          "check": "overlap_with_training",
+          "n_overlapping": 0,
+          "overlap_fraction": 0.0,
+          "threshold": 0.01,
+          "n_columns_compared": 11
+        },
+        "duration_ms": 80.25
+      },
+      {
+        "check_name": "validation_strategy",
+        "flag": "VALIDATION_STRATEGY_RISK",
+        "detail": "credit_scoring is high-risk and was validated with a 'stratified_split' split \u2014 a random split cannot tell you whether the model holds up on next period's business, which is what it will be applied to",
+        "blocking": true,
+        "metadata": {
+          "check": "out_of_time_for_high_risk",
+          "declared": "stratified_split",
+          "is_out_of_time": false,
+          "is_high_risk": true
+        },
+        "duration_ms": 0.04
+      },
+      {
+        "check_name": "feature_contract",
+        "flag": "OK",
+        "detail": "X matches the 11 feature(s) recorded in model.feature_names_in_, in order",
+        "blocking": true,
+        "metadata": {
+          "check": "feature_order",
+          "source": "model.feature_names_in_",
+          "n_features": 11,
+          "expected_order": null,
+          "actual_order": null
+        },
+        "duration_ms": 0.05
+      },
+      {
+        "check_name": "feature_drift",
+        "flag": "OK",
+        "detail": "no drift above threshold across 11 shared feature(s)",
+        "blocking": false,
+        "metadata": {
+          "n_features_scored": 11
+        },
+        "duration_ms": 72.22
+      }
+    ],
+    "fairness": [
+      {
+        "check_name": "proxy_correlation",
+        "flag": "OK",
+        "detail": "no proxy correlations above threshold across 7 comparison(s)",
+        "blocking": false,
+        "metadata": {
+          "n_comparisons": 7
+        },
+        "duration_ms": 14123.11
+      },
+      {
+        "check_name": "disparate_impact",
+        "flag": "DISPARITY_RISK",
+        "detail": "age: demographic parity diff=1.000 [0.625, 1.000] at 95% (max 0.1) \u2014 the whole 95% interval sits above 0.100",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "age",
+          "demographic_parity_diff": 1.0,
+          "threshold": 0.1,
+          "decision_threshold": 0.5,
+          "on_uncertain": "review",
+          "point": 1.0,
+          "ci_low": 0.625,
+          "ci_high": 1.0,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 1896.56
+      },
+      {
+        "check_name": "disparate_impact",
+        "flag": "OK",
+        "detail": "gender: demographic parity diff=0.005 [0.000, 0.020] at 95% (max 0.1) \u2014 the whole interval sits below 0.100",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "gender",
+          "demographic_parity_diff": 0.005,
+          "threshold": 0.1,
+          "decision_threshold": 0.5,
+          "on_uncertain": "review",
+          "point": 0.005,
+          "ci_low": 0.0003,
+          "ci_high": 0.0199,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 1896.56
+      },
+      {
+        "check_name": "shap_subgroup_gap",
+        "flag": "NOT_APPLICABLE",
+        "detail": "shap not installed \u2014 pip install bdp-model-gate[structured]",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 14368.9
+      },
+      {
+        "check_name": "counterfactual_flip",
+        "flag": "NOT_APPLICABLE",
+        "detail": "no protected attributes present as model inputs",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 0.08
+      },
+      {
+        "check_name": "equalised_odds",
+        "flag": "EQUAL_OPPORTUNITY_RISK",
+        "detail": "age: true-positive-rate difference=0.417 [0.312, 0.923] at 95% (max 0.1) \u2014 among those who should be approved, 43 is least likely to be \u2014 the whole 95% interval sits above 0.100",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "age",
+          "notion": "equal_opportunity",
+          "tpr_difference": 0.4167,
+          "group_tpr": {
+            "22": 0.8299,
+            "32": 0.7778,
+            "24": 0.7842,
+            "26": 0.7898,
+            "25": 0.7326,
+            "27": 0.7879,
+            "21": 0.8667,
+            "34": 0.8125,
+            "23": 0.8267,
+            "30": 0.7692,
+            "29": 0.7522,
+            "28": 0.7914,
+            "31": 0.7,
+            "38": 0.76,
+            "37": 0.8611,
+            "41": 0.9167,
+            "42": 0.75,
+            "40": 0.6957,
+            "33": 0.7647,
+            "36": 0.6765,
+            "35": 0.7143,
+            "45": 0.8889,
+            "39": 0.7727,
+            "44": 0.625,
+            "43": 0.5
+          },
+          "threshold": 0.1,
+          "on_uncertain": "review",
+          "point": 0.4167,
+          "ci_low": 0.3124,
+          "ci_high": 0.9231,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 34687.98
+      },
+      {
+        "check_name": "equalised_odds",
+        "flag": "EQUALISED_ODDS_RISK",
+        "detail": "age: equalised odds difference=0.417 [0.312, 0.923] at 95% (max 0.1) \u2014 TPR gap 0.417, FPR gap 0.061 \u2014 the whole 95% interval sits above 0.100",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "age",
+          "notion": "equalised_odds",
+          "equalised_odds_difference": 0.4167,
+          "tpr_difference": 0.4167,
+          "fpr_difference": 0.0606,
+          "group_fpr": {
+            "22": 0.0359,
+            "32": 0.0099,
+            "24": 0.0255,
+            "26": 0.0235,
+            "25": 0.0275,
+            "27": 0.0233,
+            "21": 0.0262,
+            "34": 0.0357,
+            "23": 0.0283,
+            "30": 0.0303,
+            "29": 0.0184,
+            "28": 0.031,
+            "31": 0.018,
+            "38": 0.0183,
+            "37": 0.0148,
+            "41": 0.0364,
+            "42": 0.0,
+            "40": 0.0606,
+            "33": 0.038,
+            "36": 0.0137,
+            "35": 0.0318,
+            "45": 0.0,
+            "39": 0.0,
+            "44": 0.0278,
+            "43": 0.0
+          },
+          "threshold": 0.1,
+          "on_uncertain": "review",
+          "point": 0.4167,
+          "ci_low": 0.3124,
+          "ci_high": 0.9231,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 34687.98
+      },
+      {
+        "check_name": "equalised_odds",
+        "flag": "OK",
+        "detail": "gender: true-positive-rate difference=0.007 [0.001, 0.039] at 95% (max 0.1) \u2014 among those who should be approved, male is least likely to be \u2014 the whole interval sits below 0.100",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "gender",
+          "notion": "equal_opportunity",
+          "tpr_difference": 0.0067,
+          "group_tpr": {
+            "male": 0.7823,
+            "female": 0.7891
+          },
+          "threshold": 0.1,
+          "on_uncertain": "review",
+          "point": 0.0067,
+          "ci_low": 0.0005,
+          "ci_high": 0.0388,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 34687.99
+      },
+      {
+        "check_name": "equalised_odds",
+        "flag": "OK",
+        "detail": "gender: equalised odds difference=0.007 [0.003, 0.039] at 95% (max 0.1) \u2014 TPR gap 0.007, FPR gap 0.005 \u2014 the whole interval sits below 0.100",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "gender",
+          "notion": "equalised_odds",
+          "equalised_odds_difference": 0.0067,
+          "tpr_difference": 0.0067,
+          "fpr_difference": 0.005,
+          "group_fpr": {
+            "male": 0.0243,
+            "female": 0.0293
+          },
+          "threshold": 0.1,
+          "on_uncertain": "review",
+          "point": 0.0067,
+          "ci_low": 0.0027,
+          "ci_high": 0.0388,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 34687.99
+      },
+      {
+        "check_name": "subgroup_calibration",
+        "flag": "SUBGROUP_CALIBRATION_RISK",
+        "detail": "age: calibration error spans 0.0102 (23) to 0.0904 (44) \u2014 gap 0.080 [0.070, 0.150] at 95% (max 0.05) \u2014 the whole 95% interval sits above 0.050",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "age",
+          "group_ece": {
+            "22": 0.01546,
+            "32": 0.02337,
+            "24": 0.01412,
+            "26": 0.0143,
+            "25": 0.01814,
+            "27": 0.01754,
+            "21": 0.03139,
+            "34": 0.03781,
+            "23": 0.01024,
+            "30": 0.02698,
+            "29": 0.0146,
+            "28": 0.01518,
+            "31": 0.03162,
+            "38": 0.04358,
+            "37": 0.06039,
+            "41": 0.05022,
+            "42": 0.07608,
+            "40": 0.06014,
+            "33": 0.01951,
+            "36": 0.02421,
+            "35": 0.0211,
+            "45": 0.07848,
+            "39": 0.06269,
+            "44": 0.09045,
+            "43": 0.05072
+          },
+          "ece_gap": 0.08021,
+          "threshold": 0.05,
+          "worst_calibrated_group": "44",
+          "on_uncertain": "review",
+          "point": 0.0802,
+          "ci_low": 0.0702,
+          "ci_high": 0.1501,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 14686.41
+      },
+      {
+        "check_name": "subgroup_calibration",
+        "flag": "OK",
+        "detail": "gender: calibration error spans 0.0086 (male) to 0.0087 (female) \u2014 gap 0.000 [0.000, 0.007] at 95% (max 0.05) \u2014 the whole interval sits below 0.050",
+        "blocking": false,
+        "metadata": {
+          "protected_attr": "gender",
+          "group_ece": {
+            "male": 0.0086,
+            "female": 0.00869
+          },
+          "ece_gap": 9e-05,
+          "threshold": 0.05,
+          "worst_calibrated_group": "female",
+          "on_uncertain": "review",
+          "point": 0.0001,
+          "ci_low": 0.0001,
+          "ci_high": 0.007,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 14686.42
+      },
+      {
+        "check_name": "group_mean_gap",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 0.0
+      },
+      {
+        "check_name": "error_parity",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 0.0
+      },
+      {
+        "check_name": "calibration_parity",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 0.0
+      },
+      {
+        "check_name": "loss_ratio_parity",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 0.0
+      }
+    ],
+    "performance": [
+      {
+        "check_name": "performance_thresholds",
+        "flag": "OK",
+        "detail": "roc_auc=0.9766 [0.974, 0.979] (min 0.8) \u2014 the whole interval sits above 0.800",
+        "blocking": true,
+        "metadata": {
+          "metric_kind": "score",
+          "metric": "roc_auc",
+          "value": 0.9766,
+          "threshold": 0.8,
+          "threshold_field": "min_score",
+          "greater_is_better": true,
+          "metric_is_fallback": false,
+          "exposure_weighted": false,
+          "on_uncertain": "review",
+          "point": 0.9766,
+          "ci_low": 0.9745,
+          "ci_high": 0.9789,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 5603.67
+      },
+      {
+        "check_name": "calibration",
+        "flag": "OK",
+        "detail": "expected calibration error=0.008 [0.007, 0.013] at 95% (max 0.1); reliability=0.0002, resolution=0.1234 \u2014 the whole interval sits below 0.100",
+        "blocking": true,
+        "metadata": {
+          "ece": 0.00758,
+          "threshold": 0.1,
+          "n_bins": 10,
+          "strategy": "uniform",
+          "brier": 0.04912,
+          "binned_brier": 0.04971,
+          "reliability": 0.00022,
+          "resolution": 0.12335,
+          "uncertainty": 0.17284,
+          "base_rate": 0.22222,
+          "on_uncertain": "review",
+          "point": 0.0076,
+          "ci_low": 0.0068,
+          "ci_high": 0.0127,
+          "ci_level": 0.95,
+          "bootstrap_samples": 1000
+        },
+        "duration_ms": 666.96
+      },
+      {
+        "check_name": "actual_vs_expected",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": true,
+        "metadata": {},
+        "duration_ms": 0.0
+      },
+      {
+        "check_name": "risk_discrimination",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": true,
+        "metadata": {},
+        "duration_ms": 0.0
+      }
+    ],
+    "compliance": [
+      {
+        "check_name": "compliance_mapping",
+        "flag": "OK",
+        "detail": "model_card.legal_basis present",
+        "blocking": true,
+        "metadata": {
+          "check": "model_card.legal_basis"
+        },
+        "duration_ms": 0.03
+      },
+      {
+        "check_name": "compliance_mapping",
+        "flag": "OK",
+        "detail": "model_card.data_minimization_justification present",
+        "blocking": true,
+        "metadata": {
+          "check": "model_card.data_minimization_justification"
+        },
+        "duration_ms": 0.03
+      },
+      {
+        "check_name": "compliance_mapping",
+        "flag": "OK",
+        "detail": "model_card.training_data_source present",
+        "blocking": true,
+        "metadata": {
+          "check": "model_card.training_data_source"
+        },
+        "duration_ms": 0.03
+      },
+      {
+        "check_name": "compliance_mapping",
+        "flag": "COMPLIANCE_RISK",
+        "detail": "high-risk use case requires a completed DPIA",
+        "blocking": true,
+        "metadata": {
+          "check": "dpia_trigger",
+          "is_high_risk": true
+        },
+        "duration_ms": 0.03
+      },
+      {
+        "check_name": "compliance_mapping",
+        "flag": "OK",
+        "detail": "explainability method documented",
+        "blocking": true,
+        "metadata": {
+          "check": "explainability_requirement",
+          "influences_person": true
+        },
+        "duration_ms": 0.03
+      },
+      {
+        "check_name": "monotonicity",
+        "flag": "NOT_APPLICABLE",
+        "detail": "no actuarial.monotonic_features declared \u2014 a monotonicity requirement is a claim about your product ({\"prior_claims\": \"increasing\"}), and no library can guess which factors carry one or in which direction",
+        "blocking": true,
+        "metadata": {},
+        "duration_ms": 0.01
+      },
+      {
+        "check_name": "prediction_dislocation",
+        "flag": "NOT_APPLICABLE",
+        "detail": "check does not apply to a binary task (supports: regression)",
+        "blocking": false,
+        "metadata": {},
+        "duration_ms": 0.0
+      }
+    ],
+    "security": [
+      {
+        "check_name": "adversarial_robustness",
+        "flag": "OK",
+        "detail": "flip rate under random perturbation=0.0400 (max 0.05)",
+        "blocking": true,
+        "metadata": {
+          "flip_rate": 0.04,
+          "threshold": 0.05,
+          "method": "random",
+          "task": "binary"
+        },
+        "duration_ms": 169.97
+      },
+      {
+        "check_name": "pii_leakage",
+        "flag": "OK",
+        "detail": "no PII patterns detected",
+        "blocking": true,
+        "metadata": {},
+        "duration_ms": 37.64
+      },
+      {
+        "check_name": "prompt_injection",
+        "flag": "NOT_APPLICABLE",
+        "detail": "no generative component supplied \u2014 set context.generate_fn for the direct surface (the payload arrives as the user turn) or context.inject_fn for the indirect one (the payload arrives where your pipeline puts retrieved content). The second is the surface that matters for a regulated deployment",
+        "blocking": true,
+        "metadata": {},
+        "duration_ms": 0.01
+      },
+      {
+        "check_name": "report_injection",
+        "flag": "OK",
+        "detail": "no instruction-shaped text in the 27 string(s) this run would copy into its report",
+        "blocking": false,
+        "metadata": {
+          "n_strings_scanned": 27
+        },
+        "duration_ms": 3.87
+      }
+    ]
+  }
+}
