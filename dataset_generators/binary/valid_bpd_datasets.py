@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from dataset_generator_utils import DatasetBundle, binary_target, sigmoid
+from dataset_generator_utils import (
+    DatasetBundle, binary_target,
+      sigmoid, perturb_features)
 
 
 def generate_fraud_dataset(
@@ -1141,6 +1143,9 @@ def generate_adversarial_dataset(
         "x2": x2,
         "x3": x3,
     })
+
+    # Applying tiny perturbations to the features to simulate adversarial examples.
+    X = perturb_features(X)
 
     return DatasetBundle(
         X=X,
