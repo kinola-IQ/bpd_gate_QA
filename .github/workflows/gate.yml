@@ -27,6 +27,20 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      # Setup CML GitHub Action
+      - name: Setup CML
+        uses: iterative/setup-cml@v3
+
+      # Train model and run model gate
+      - name: train model
+        run: |
+          python model_build.py
+
       - name: Run Model Gate
         id: gate
         run: |
@@ -58,6 +72,7 @@ jobs:
       - name: Publish to Hugging Face
         env:
           HF_TOKEN: ${{secrets.HF_TOKEN}}
+          HF_REPO_ID: ${{secrets.HF_REPO_ID}}
         run: |
           python publish_to_huggingface.py
 
