@@ -27,6 +27,16 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libpixman-1-dev \
+            libcairo2-dev \
+            libjpeg-dev \
+            libpango1.0-dev \
+            libgif-dev
+            
       - name: Install jq
         run: |
           sudo apt-get update
