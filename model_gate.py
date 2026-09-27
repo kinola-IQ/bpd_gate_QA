@@ -97,7 +97,7 @@ def main():
         "legal_basis": "Contractual necessity (NDPA 2023)",
         "data_minimization_justification": "Affordability signals only.",
         "training_data_source": "Internal loan dataset",
-        "dpia_completed": True,          # <-- Yo! Dumininu, review, TRUE or FALSE?, switching supress the decision reasons 
+        "dpia_completed": False,          # <-- Yo! Dumininu, review, TRUE or FALSE?, switching supress the decision reasons 
         "influences_decision_about_person": True,
         "explainability_method": "SHAP",
         "validation_strategy": "stratified_split",
