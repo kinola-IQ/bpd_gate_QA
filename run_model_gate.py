@@ -1,24 +1,33 @@
-from bdp_model_gate import ModelGate, StructuredGateContext
-import joblib
 import json
 
+import joblib
+from bdp_model_gate import ModelGate, StructuredGateContext
+
 from model_build import (
-    DECISION_MAP, build_reason, X_train, X_val, y_val, prot_val,
-    model_card
+    DECISION_MAP,
+    X_train_enc,
+    X_val_enc,
+    build_reason,
+    model_card,
+    prot_val,
+    y_val,
 )
 
 model = joblib.load("model_params.pkl")
-
 def main():
     context = StructuredGateContext(
         model=model,
-        X_train=X_train,
-        X=X_val,
+        X_train=X_train_enc,
+        X=X_val_enc,
         y_true=y_val,
-        y_pred=model.predict_proba(X_val)[:, 1],
+        y_pred=model.predict_proba(X_val_enc)[:, 1],
         protected_df=prot_val,
         model_card=model_card,
     )
+    # context = StructuredGateContext(
+    # model=model, X=X_val_enc, y_true=y_val, y_pred=y_pred,
+    # protected_df=prot_val, X_train=X_train_enc,
+    # model_card=model_card, task="binary",)
 
     report = ModelGate().run(context)
 
