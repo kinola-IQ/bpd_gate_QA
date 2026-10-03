@@ -1,10 +1,16 @@
-from bdp_model_gate import ModelGate, StructuredGateContext
-import joblib
 import json
 import pandas as pd
+import joblib
+from bdp_model_gate import ModelGate, StructuredGateContext
+
 from model_build import (
-    DECISION_MAP, build_reason, X_train_path, X_val_path, y_val_path, prot_val_path,
-    model_card
+    DECISION_MAP,
+    X_train_path,
+    X_val_path,
+    build_reason,
+    model_card,
+    prot_val_path,
+    y_val_path,
 )
 
 model = joblib.load("model_params.pkl")
@@ -23,6 +29,10 @@ def main():
         protected_df=prot_val,
         model_card=model_card,
     )
+    # context = StructuredGateContext(
+    # model=model, X=X_val_enc, y_true=y_val, y_pred=y_pred,
+    # protected_df=prot_val, X_train=X_train_enc,
+    # model_card=model_card, task="binary",)
 
     report = ModelGate().run(context)
 
