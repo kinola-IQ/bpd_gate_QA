@@ -147,6 +147,10 @@ model_card = {
         "validation_strategy": "stratified_split",
     }
 
+X_train_path = "X_train.csv"
+X_val_path = "X_val.csv"
+y_val_path = "y_val.csv"
+prot_val_path = "prot_val.csv"
 
 def main() -> None:   
     preprocessor = ColumnTransformer(
@@ -200,7 +204,12 @@ def main() -> None:
 
     # Save trained pipeline
     model_path = "model_params.pkl"
+    X_val.to_csv(X_val_path, index=False)
+    y_val.to_csv(y_val_path, index=False)
+    prot_val.to_csv(prot_val_path, index=False)
+    X_train.to_csv(X_train_path, index=False)
     joblib.dump(pipeline, model_path)
+
 
     
 
