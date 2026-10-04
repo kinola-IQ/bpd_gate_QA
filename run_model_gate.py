@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import joblib
 from bdp_model_gate import ModelGate, StructuredGateContext
+# from bdp_model_gate.structured import default_structured_checks (GateConfig)
 
 from model_build import (
     DECISION_MAP,
@@ -12,6 +13,7 @@ from model_build import (
     prot_val_path,
     y_val_path,
 )
+
 
 model = joblib.load("model_params.pkl")
 X_train = pd.read_csv(X_train_path)
@@ -29,11 +31,12 @@ def main():
         protected_df=prot_val,
         model_card=model_card,
     )
-    # context = StructuredGateContext(
-    # model=model, X=X_val_enc, y_true=y_val, y_pred=y_pred,
-    # protected_df=prot_val, X_train=X_train_enc,
-    # model_card=model_card, task="binary",)
-
+    """
+    This block ignores the shap_subgroup_gap to enable fast local execution
+    PS: Do not uncomment before push!
+    config = GateConfig()
+    checks = [c for c in default_structured_checks(config) if c.name != "shap_subgroup_gap"]
+    report = ModelGate(checks=checks).run(context)"""
     report = ModelGate().run(context)
 
     decision = DECISION_MAP[report.gate_status]
