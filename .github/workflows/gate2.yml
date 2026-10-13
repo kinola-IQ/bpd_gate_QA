@@ -30,7 +30,7 @@ jobs:
       - name: Run Model Gate
         id: gate
         run: |
-          python run_model_gate.py > gate_result.json
+          python run_model_gate_pass.py > gate_result.json
 
           DECISION=$(jq -r '.decision' gate_result.json)
           REASON=$(jq -r '.reason' gate_result.json)
