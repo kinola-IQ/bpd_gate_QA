@@ -15,10 +15,10 @@ from model_build import (
 )
 
 
-model = joblib.load("saved_models\adversarial_model.pkl")
-X_train = pd.read_csv("validation_data_adversarial.csv")
-X_val = pd.read_csv("validation_data_adversarial.csv")
-y_val = pd.read_csv("validation_labels_adversarial.csv").iloc[:, 0]
+model = joblib.load(r"saved_models\adversarial_model.pkl")
+X_train = pd.read_csv(r"validation_data_adversarial.csv")
+X_val = pd.read_csv(r"validation_data_adversarial.csv")
+y_val = pd.read_csv(r"validation_labels_adversarial.csv").iloc[:, 0]
 prot_val = pd.read_csv(prot_val_path)
 
 def main():
