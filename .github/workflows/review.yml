@@ -1,10 +1,12 @@
-name: Model Governance Gate2
-
+name: Model Governance Gate (REVIEW)
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   model-gate:
@@ -26,6 +28,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+
+      # The REVIEW scenario builds its synthetic data and model inside
+      # run_model_gate_review.py (via ci_fixture_gate.make_data), so it no longer
+      # depends on the committed X_*.csv files that made it crash.
 
       - name: Run Model Gate
         id: gate
@@ -55,10 +61,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # FIX: this job runs on a fresh runner, so Python and huggingface_hub
+      # must be installed here too (previously the script ran without them).
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install publish dependencies
+        run: pip install huggingface_hub==2.0.0
+
       - name: Publish to Hugging Face
         env:
           HF_TOKEN: ${{secrets.HF_TOKEN}}
           HF_REPO_ID: ${{secrets.HF_REPO_ID}}
+          # FIX: publish the artifact that was actually gated in this workflow.
+          MODEL_FILE: model_params.pkl  # synthetic review model is not saved; this job should never run for REVIEW
         run: |
           python publish_to_huggingface.py
 
@@ -71,10 +88,24 @@ jobs:
     if: needs.model-gate.outputs.decision == 'REVIEW'
 
     runs-on: ubuntu-latest
+    # FIX: creating a branch/PR needs write permissions.
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
 
+      # FIX: create-pull-request only opens a PR when there is a change to
+      # commit; previously there was none, so no PR was ever created. Commit
+      # the gate report (same approach as gate-fixture.yml).
+      - uses: actions/download-artifact@v4
+        with:
+          name: gate-report
+          path: reports/
+
+      # FIX: labels are set here; actions-ecosystem/action-add-labels was
+      # removed because it needs a PR/issue event context and fails on push.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
@@ -87,18 +118,18 @@ jobs:
 
             Governance team should review before release.
           branch: model-gate-review
-
-      - name: Add review label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: |
-            governance-review
+          commit-message: "Model gate review report"
+          add-paths: reports/gate_result.json
+          labels: governance-review
 
   blocked:
     needs: model-gate
     if: needs.model-gate.outputs.decision == 'BLOCK'
 
     runs-on: ubuntu-latest
+    # FIX: opening an issue needs issues: write.
+    permissions:
+      issues: write
 
     steps:
       - name: Fail Pipeline
@@ -112,10 +143,10 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.create({
+            await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: 'Model Gate Blocked Deployment',
+              title: 'Model Gate Blocked Deployment (REVIEW scenario)',
               body: `
               Deployment blocked by Model Gate.
 

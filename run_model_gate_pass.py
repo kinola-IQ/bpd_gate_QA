@@ -1,53 +1,74 @@
+"""
+PASS scenario (pass.yml): the synthetic adversarial LogisticRegression model
+(adversarial_model.pkl, features x1..x3) on synthetic data.
+
+Expected decision: PASS.
+
+FIXES (2026-10-21):
+  1. X_train and X_val were the SAME file (validation_data_adversarial.csv),
+     so split_overlap saw 100% of validation rows in training and blocked.
+     The model's original training set was not saved, so the file is now cut
+     into two disjoint halves: the first half is the reference ("training")
+     distribution for the drift / overlap checks, the second half is scored.
+  2. It used the loan model's card (credit_scoring + stratified_split), which
+     blocked on validation_strategy. It now has its own card describing this
+     synthetic model honestly.
+  3. protected_df was commented out; the synthetic data has no protected
+     attributes, so it is simply not passed (fairness checks report N/A).
+"""
 import json
-import pandas as pd
+
 import joblib
+import pandas as pd
 from bdp_model_gate import ModelGate, StructuredGateContext
-# from bdp_model_gate.structured import default_structured_checks (GateConfig)
 
-from model_build import (
-    DECISION_MAP,
-    X_train_path,
-    X_val_path,
-    build_reason,
-    model_card,
-    prot_val_path,
-    y_val_path,
-)
+from model_build import DECISION_MAP, build_reason, clean_detail
 
+MODEL_PATH = "adversarial_model.pkl"
+DATA_PATH = "validation_data_adversarial.csv"
+LABELS_PATH = "validation_labels_adversarial.csv"
 
-model = joblib.load("adversarial_model.pkl")
-X_train = pd.read_csv("validation_data_adversarial.csv")
-X_val = pd.read_csv("validation_data_adversarial.csv")
-y_val = pd.read_csv("validation_labels_adversarial.csv").iloc[:, 0]
-prot_val = pd.read_csv(prot_val_path)
+# Card for THIS model. It is synthetic and not used on people, so it is not a
+# high-risk use case and a random split is an acceptable validation strategy.
+pass_model_card = {
+    "use_case": "ci_pipeline_test",
+    "legal_basis": "Not applicable: synthetic data, no personal data",
+    "data_minimization_justification": "Three synthetic numeric features (x1..x3); no personal attributes.",
+    "training_data_source": "Synthetic adversarial fixture (validation_data_adversarial.csv); not real customer data",
+    "dpia_completed": False,  # not required: not a high-risk use case
+    "influences_decision_about_person": False,
+    "explainability_method": "SHAP",
+    "validation_strategy": "random_split",
+}
+
 
 def main():
+    model = joblib.load(MODEL_PATH)
+    X = pd.read_csv(DATA_PATH)
+    y = pd.read_csv(LABELS_PATH).iloc[:, 0]
+
+    # Disjoint halves -> no train/validation overlap.
+    half = len(X) // 2
+    X_train = X.iloc[:half].reset_index(drop=True)
+    X_val = X.iloc[half:].reset_index(drop=True)
+    y_val = y.iloc[half:].reset_index(drop=True)
+
     context = StructuredGateContext(
         model=model,
         X_train=X_train,
         X=X_val,
         y_true=y_val,
         y_pred=model.predict_proba(X_val)[:, 1],
-        # protected_df=prot_val,
-        model_card=model_card,
+        model_card=pass_model_card,
+        task="binary",
     )
-    """
-    This block ignores the shap_subgroup_gap to enable fast local execution
-    PS: Do not uncomment before push!
-    config = GateConfig()
-    checks = [c for c in default_structured_checks(config) if c.name != "shap_subgroup_gap"]
-    report = ModelGate(checks=checks).run(context)"""
     report = ModelGate().run(context)
 
-    decision = DECISION_MAP[report.gate_status]
-    reason = build_reason(report)
+    print(json.dumps({"decision": DECISION_MAP[report.gate_status], "reason": build_reason(report)}))
 
-    result = {
-        "decision": DECISION_MAP[report.gate_status],
-        "reason": build_reason(report),
-        }
-    
-    print(json.dumps(result))
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:  # a crash must never look like a pass
+        print(json.dumps({"decision": "BLOCK", "reason": f"gate crashed: {clean_detail(e)}"}))
