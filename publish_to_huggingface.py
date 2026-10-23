@@ -54,6 +54,5 @@ def main() -> None:
         f"to https://huggingface.co/{repo_id}"
     )
 
-
 if __name__ == "__main__":
     main()
